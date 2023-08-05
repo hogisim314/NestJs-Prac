@@ -15,10 +15,10 @@ import { User } from 'src/auth/user.entity';
 export class BoardsController {
     constructor(private boardService:BoardsService) {}
 
-    // @Get() 
-    // getAllBoard():Board[] {
-    //     return this.boardService.getAllBoards();
-    // }
+    @Get() 
+    getAllBoard(@GetUser() user:User) : Promise<Board[]> {
+        return this.boardService.getAllBoards(user);
+    }
 
     @Post()
     @UsePipes(ValidationPipe)
@@ -43,8 +43,8 @@ export class BoardsController {
         return this.boardService.updateBoardStatus(id,status);
     }
 
-    @Get()
-    getAllTask() : Promise<Board[]> {
-        return this.boardService.getAllBoards();
-    }
+    // @Get()
+    // getAllTask() : Promise<Board[]> {
+    //     return this.boardService.getAllBoards();
+    // }
 }

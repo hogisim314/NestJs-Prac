@@ -5,6 +5,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardRepository } from './board.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from './board.entity';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class BoardsService {
@@ -15,8 +16,8 @@ export class BoardsService {
     //     return this.boards;
     // }
 
-    createBoard(createBoardDto : CreateBoardDto) : Promise<Board> {
-        return this.boardRepository.createBoard(createBoardDto);
+    createBoard(createBoardDto : CreateBoardDto, user: User) : Promise<Board> {
+        return this.boardRepository.createBoard(createBoardDto, user);
     }
 
     async getBoardById(id:number) : Promise<Board> {
@@ -44,8 +45,11 @@ export class BoardsService {
 
     }
 
-    async getAllBoards() : Promise<Board[]> {
-        return await this.boardRepository.find();
+    async getAllBoards(user:User) : Promise<Board[]> {
+        const query = this.boardRepository.createQueryBuilder('board');
+        query.where('board.userId = :userId', {userId : user.id});
+        const boards = await query.getMany();
+        return boards;
     }
 }
 
@@ -60,29 +64,3 @@ myPromise.then(n=>{
 }).catch(error => {
     console.log(error);
 })
-
-function fetchUser() {
-    var url = 'https://jsonplaceholder.typicode.com/users/1'
-    return fetch(url).then(function(response) {
-      return response.json();
-    });
-  }
-  
-  function fetchTodo() {
-    var url = 'https://jsonplaceholder.typicode.com/todos/1';
-    return fetch(url).then(function(response) {
-      return response.json();
-    });
-  }
-
-  async function logTodoTitle() {
-    try {
-        var user = await fetchUser();
-        if (user.id===1) {
-            var todo = await fetchTodo();
-            console.log(todo.title);
-        }
-    } catch(error) {
-        console.log(error);
-    }
-  }
